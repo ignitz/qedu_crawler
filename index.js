@@ -341,6 +341,7 @@ const appendToJsonFile = async (filename, data) => {
       const state = states[i];
       let state_name = await state.getProperty("innerText");
       state_name = await state_name.jsonValue();
+      state_name = state_name.split("\n")[0];
       console.log(state_name);
 
       await state.click();
@@ -355,6 +356,11 @@ const appendToJsonFile = async (filename, data) => {
 
       for (let j = 0; j < cities.length; j++) {
         const city = cities[j];
+        let city_name = await city.getProperty("innerText");
+        city_name = await city_name.jsonValue();
+        city_name = city_name.split("\n")[0];
+        console.log("\t" + city_name);
+
         await city.click();
 
         const child_select =
@@ -388,6 +394,7 @@ const appendToJsonFile = async (filename, data) => {
           }
 
           const nome = await getNomeEscola(page2);
+          console.log("\t\t" + nome.nome);
           const dados_gerais = await getDadosGerais(page2);
           const outras_informacoes = await getOutrasInformacoes(page2);
           const alimentacao = await getAlimentacao(page2);
@@ -400,6 +407,8 @@ const appendToJsonFile = async (filename, data) => {
           const computadores_e_internet = await getComputadoresEInternet(page2);
 
           const data = {
+            estado: state_name,
+            municipio: city_name,
             ...nome,
             ...dados_gerais,
             ...outras_informacoes,
