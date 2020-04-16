@@ -365,6 +365,7 @@ const appendToJsonFile = async (filename, data) => {
 
         const child_select =
           "body > section:nth-child(9) > div > div > div.sg-column.span6.sg-entity-schools > ul > li";
+        await page.waitFor(500);
 
         while ((await page.$(child_select)) === null) {
           await page.waitFor(500);
@@ -380,6 +381,10 @@ const appendToJsonFile = async (filename, data) => {
           const page2 = await newPagePromise;
           await page2.bringToFront();
           await page2.waitForNavigation();
+
+          const nome = await getNomeEscola(page2);
+          console.log("\t\t" + nome.nome);
+
           const dados_gerais_selector =
             "body > section.container.censo-section.normal-section > div > div:nth-child(3) > div.group-educacenso.highlight > table";
           if ((await page2.$(dados_gerais_selector)) === null) {
@@ -387,14 +392,21 @@ const appendToJsonFile = async (filename, data) => {
               "body > section.subnav-section.gray-pattern > div.subnav.with-avatar-small-margin > ul > li:nth-child(7) > a";
             if ((await page2.$(censoTab)) === null) {
               await page2.close();
+              const data = {
+                estado: state_name,
+                municipio: city_name,
+                ...nome
+              };
+
+              await appendToJsonFile("data.jsonl", data);
+
+              dataset.push(data);
               continue;
             }
             await page2.click(censoTab);
             await page2.waitFor(500);
           }
 
-          const nome = await getNomeEscola(page2);
-          console.log("\t\t" + nome.nome);
           const dados_gerais = await getDadosGerais(page2);
           const outras_informacoes = await getOutrasInformacoes(page2);
           const alimentacao = await getAlimentacao(page2);
